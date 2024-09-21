@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 
 enum QueueStatus {
-  ACTIVE = 'ACTIVE', // the user is added to the queue
-  WAITING = 'WAITING', // the doctor is received the user
+  ACTIVE = "ACTIVE", // the user is added to the queue
+  WAITING = "WAITING", // the doctor is received the user
 
-  FINISHED = 'FINISHED' // the user finished the appointment
+  FINISHED = "FINISHED" // the user finished the appointment
 }
 
 @Injectable()
@@ -15,11 +15,11 @@ export class QueueService {
   ) {
   }
 
-  private queue: { patientId: number; position: number, status: QueueStatus }[] = [];
+  private queue: { patientId: number; position: number, status: QueueStatus, createdAt: string }[] = [];
 
   addPatient(patientId: number): number {
     const position = this.queue.length + 1;
-    this.queue.push({ patientId, position, status: QueueStatus.ACTIVE });
+    this.queue.push({ patientId, position, status: QueueStatus.ACTIVE, createdAt: Date.now().toLocaleString() });
     return position;
   }
 
@@ -37,6 +37,9 @@ export class QueueService {
         ...user,
         position: patient.position,
         status: patient.status,
+        firstName: user.fullName.split(' ')?.[0] || "",
+        lastName: user.fullName.split(' ')?.[1] || "",
+        createdAt: patient.createdAt || "",
       };
     });
   }
