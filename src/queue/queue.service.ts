@@ -15,11 +15,11 @@ export class QueueService {
   ) {
   }
 
-  private queue: { patientId: number; position: number, status: QueueStatus, createdAt: string }[] = [];
+  private queue: { patientId: number; position: number, status: QueueStatus, createdAt: number }[] = [];
 
   addPatient(patientId: number): number {
     const position = this.queue.length + 1;
-    this.queue.push({ patientId, position, status: QueueStatus.ACTIVE, createdAt: Date.now().toLocaleString() });
+    this.queue.push({ patientId, position, status: QueueStatus.ACTIVE, createdAt: Date.now() });
     return position;
   }
 
