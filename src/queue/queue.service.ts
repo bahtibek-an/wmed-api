@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 
 enum QueueStatus {
-  ACTIVE = "ACTIVE", // the user is added to the queue
-  WAITING = "WAITING", // the doctor is received the user
+  ACTIVE = 'ACTIVE', // the user is added to the queue
+  WAITING = 'WAITING', // the doctor is received the user
 
-  FINISHED = "FINISHED" // the user finished the appointment
+  FINISHED = 'FINISHED' // the user finished the appointment
 }
 
 @Injectable()
@@ -15,11 +15,17 @@ export class QueueService {
   ) {
   }
 
-  private queue: { patientId: number; position: number, status: QueueStatus, createdAt: number }[] = [];
+  private queue: {
+    patientId: number;
+    position: number,
+    status: QueueStatus,
+    createdAt: number,
+    doctorId: number
+  }[] = [];
 
-  addPatient(patientId: number): number {
+  addPatient(patientId: number, doctorId: number): number {
     const position = this.queue.length + 1;
-    this.queue.push({ patientId, position, status: QueueStatus.ACTIVE, createdAt: Date.now() });
+    this.queue.push({ patientId, position, status: QueueStatus.ACTIVE, doctorId, createdAt: Date.now() });
     return position;
   }
 
@@ -28,8 +34,13 @@ export class QueueService {
     this.updatePositions();
   }
 
-  async getQueue() {
-    const patients = this.queue;
+  async getQueue(doctorId?: number) {
+    let patients = this.queue;
+
+    if (doctorId) {
+      patients = patients.filter(patient => patient.doctorId === doctorId);
+    }
+
     const users = await this.userService.findUsersByIds(patients.map((item => item.patientId)));
     return users.map(user => {
       const patient = patients.find(p => p.patientId === user.id);
@@ -37,9 +48,10 @@ export class QueueService {
         ...user,
         position: patient.position,
         status: patient.status,
-        firstName: user.fullName.split(' ')?.[0] || "",
-        lastName: user.fullName.split(' ')?.[1] || "",
-        createdAt: patient.createdAt || "",
+        firstName: user.fullName.split(' ')?.[0] || '',
+        lastName: user.fullName.split(' ')?.[1] || '',
+        createdAt: patient.createdAt || '',
+        doctorId: patient.doctorId
       };
     });
   }

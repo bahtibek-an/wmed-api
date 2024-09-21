@@ -24,7 +24,6 @@ export class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 
   @Post()
-  @UseInterceptors(getMulterConfigForImage("avatar"))
   @ApiBody({ type: CreateDoctorDto })
   @ApiResponse({status: HttpStatus.CREATED, type: CreateDoctorDto, description: "The doctor has been created successfully"})
   create(

@@ -1,7 +1,6 @@
 import {
   WebSocketGateway,
   SubscribeMessage,
-  MessageBody,
   WebSocketServer,
   OnGatewayConnection, OnGatewayDisconnect,
 } from '@nestjs/websockets';
@@ -14,6 +13,7 @@ import { Server, Socket } from 'socket.io';
     origin: "*"
   }
 })
+
 export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
@@ -31,8 +31,8 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('joinQueue')
-  async handleJoinQueue(client: Socket, data: { patientId: number }) {
-    const position = this.queueService.addPatient(data.patientId);
+  async handleJoinQueue(client: Socket, data: { patientId: number, doctorId: number }) {
+    const position = this.queueService.addPatient(data.patientId, data.doctorId);
     const isPatientExists = await this.queueService.isPatientExists(data.patientId);
     if (!data.patientId || !isPatientExists) {
       client.emit('error', { message: 'Patient does not exist' });
@@ -50,8 +50,8 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('getAllPatients')
-  async handleGetAllPatients(client: Socket) {
-    const users = await this.queueService.getQueue();
+  async handleGetAllPatients(client: Socket, data: { doctorId?: number }) {
+    const users = await this.queueService.getQueue(data.doctorId);
     client.emit('queueUpdated', users);
   }
 }
