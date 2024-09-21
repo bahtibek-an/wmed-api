@@ -8,7 +8,12 @@ import {
 import { QueueService } from './queue.service';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    credentials: true,
+    origin: "*"
+  }
+})
 export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
