@@ -18,7 +18,7 @@ export class QueueService {
   private queue: { patientId: number; position: number, status: QueueStatus, createdAt: number, doctorId: number }[] = [];
 
   addPatient(patientId: number, doctorId: number): number {
-    const position = this.queue.length + 1;
+    const position = this.queue?.at(-1)?.position + 1 || 0;
     this.queue.push({ patientId, position, status: QueueStatus.ACTIVE, doctorId, createdAt: Date.now() });
     return position;
   }
