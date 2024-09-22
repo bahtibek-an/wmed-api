@@ -50,8 +50,8 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('getAllPatients')
-  async handleGetAllPatients(client: Socket, data: { doctorId?: number }) {
-    const users = await this.queueService.getQueue(data.doctorId);
+  async handleGetAllPatients(client: Socket) {
+    const users = await this.queueService.getQueue();
     client.emit('queueUpdated', users);
   }
 }
